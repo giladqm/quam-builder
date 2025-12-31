@@ -78,6 +78,7 @@ class BaseTransmon(Qubit):
     id: Union[int, str]
 
     xy: Union[XYDriveIQ, XYDriveMW] = None
+    xy_sl: Union[XYDriveIQ, XYDriveMW] = None
     resonator: Union[ReadoutResonatorIQ, ReadoutResonatorMW] = None
 
     f_01: float = None
@@ -95,7 +96,7 @@ class BaseTransmon(Qubit):
     grid_location: str = None
     gate_fidelity: Dict[str, Any] = field(default_factory=dict)
     
-    twirl_measurment: bool = False
+    twirl_measurement: bool = False
     
     extras: Dict[str, Any] = field(default_factory=dict)
 
@@ -229,7 +230,7 @@ class BaseTransmon(Qubit):
             threshold = self.resonator.operations[pulse_name].threshold
         
         do_flip = declare(int)
-        if self.twirl_measurment:
+        if self.twirl_measurement:
             assign(do_flip, Random().rand_int(2))
             with if_(do_flip == 1, unsafe=True):
                 self.xy.play("x180")
@@ -237,7 +238,7 @@ class BaseTransmon(Qubit):
 
         self.resonator.measure(pulse_name, qua_vars=(I, Q))
 
-        if self.twirl_measurment:
+        if self.twirl_measurement:
             assign(state, Cast.to_int(I > threshold))
             with if_(do_flip == 1, unsafe=True):
                 assign(state, 1- state)
